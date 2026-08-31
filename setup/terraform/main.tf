@@ -72,15 +72,28 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private.id
 }
 
+resource "aws_security_group" "vpc_endpoints" {
+  name   = "vpc-endpoints-sg"
+  vpc_id = aws_vpc.vpc.id
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.vpc.cidr_block]
+  }
+}
+
 # Create EKS endpoint for private access
 resource "aws_vpc_endpoint" "eks" {
   count               = var.enable_private == true ? 1 : 0 # only enable when private
   vpc_id              = aws_vpc.vpc.id
   service_name        = "com.amazonaws.us-east-1.eks"
   vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_eks_cluster.main.vpc_config.0.cluster_security_group_id]
+  security_group_ids  = [aws_security_group.vpc_endpoints.id]
   subnet_ids          = [aws_subnet.private_subnet.id]
   private_dns_enabled = true
+  depends_on          = [aws_eks_cluster.main]
 }
 
 # Create EC2 endpoint for private access
@@ -89,8 +102,10 @@ resource "aws_vpc_endpoint" "ec2" {
   vpc_id              = aws_vpc.vpc.id
   service_name        = "com.amazonaws.us-east-1.ec2"
   vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_eks_cluster.main.vpc_config.0.cluster_security_group_id]
+  security_group_ids  = [aws_security_group.vpc_endpoints.id]
+  subnet_ids          = [aws_subnet.private_subnet.id]
   private_dns_enabled = true
+  depends_on          = [aws_eks_cluster.main]
 }
 
 resource "aws_vpc_endpoint" "ecr-dkr-endpoint" {
@@ -98,9 +113,10 @@ resource "aws_vpc_endpoint" "ecr-dkr-endpoint" {
   vpc_id              = aws_vpc.vpc.id
   service_name        = "com.amazonaws.us-east-1.ecr.dkr"
   vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_eks_cluster.main.vpc_config.0.cluster_security_group_id]
+  security_group_ids  = [aws_security_group.vpc_endpoints.id]
   subnet_ids          = [aws_subnet.private_subnet.id]
   private_dns_enabled = true
+  depends_on          = [aws_eks_cluster.main]
 }
 
 resource "aws_vpc_endpoint" "ecr-api-endpoint" {
@@ -108,9 +124,10 @@ resource "aws_vpc_endpoint" "ecr-api-endpoint" {
   vpc_id              = aws_vpc.vpc.id
   service_name        = "com.amazonaws.us-east-1.ecr.api"
   vpc_endpoint_type   = "Interface"
-  security_group_ids  = [aws_eks_cluster.main.vpc_config.0.cluster_security_group_id]
+  security_group_ids  = [aws_security_group.vpc_endpoints.id]
   subnet_ids          = [aws_subnet.private_subnet.id]
   private_dns_enabled = true
+  depends_on          = [aws_eks_cluster.main]
 }
 
 ###################
@@ -186,18 +203,13 @@ resource "aws_iam_role_policy_attachment" "eks_service" {
 ##################
 # EKS Node Group
 ##################
-# Track latest release for the given k8s version
-data "aws_ssm_parameter" "eks_ami_release_version" {
-  name = "/aws/service/eks/optimized-ami/${aws_eks_cluster.main.version}/amazon-linux-2/recommended/release_version"
-}
-
 resource "aws_eks_node_group" "main" {
   node_group_name = "udacity"
   cluster_name    = aws_eks_cluster.main.name
   version         = aws_eks_cluster.main.version
   node_role_arn   = aws_iam_role.node_group.arn
   subnet_ids      = [var.enable_private == true ? aws_subnet.private_subnet.id : aws_subnet.public_subnet.id]
-  release_version = nonsensitive(data.aws_ssm_parameter.eks_ami_release_version.value)
+  ami_type        = "BOTTLEROCKET_x86_64"
   instance_types  = ["t3.small"]
 
   scaling_config {
@@ -314,11 +326,6 @@ resource "aws_iam_role_policy_attachment" "codebuild" {
 ####################
 resource "aws_iam_user" "github_action_user" {
   name = "github-action-user"
-}
-
-resource "aws_iam_user_policy" "github_action_user_permission" {
-  user   = aws_iam_user.github_action_user.name
-  policy = data.aws_iam_policy_document.github_policy.json
 }
 
 data "aws_iam_policy_document" "github_policy" {

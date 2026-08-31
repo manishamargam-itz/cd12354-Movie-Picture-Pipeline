@@ -1,5 +1,6 @@
 variable "k8s_version" {
-  default = "1.25"
+  # Keep the cluster version compatible with the AL2_x86_64 node group AMI.
+  default = "1.36"
 }
 
 variable "enable_private" {
