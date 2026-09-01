@@ -4,7 +4,6 @@ import axios from 'axios';
 
 function MovieList({ onMovieHover }) {
   const [movies, setMovies] = useState([]);
-  const [hoveredMovieId, setHoveredMovieId] = useState(null);
 
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_MOVIE_API_URL}/movies`).then((response) => {
@@ -15,24 +14,12 @@ function MovieList({ onMovieHover }) {
   return (
     <ul>
       {movies.map((movie) => (
-        <li 
-          className="movieItem" 
-          key={movie.id} 
-          onMouseEnter={() => {
-            setHoveredMovieId(movie.id);
-            onMovieHover(movie);
-          }}
-          onMouseLeave={() => {
-            setHoveredMovieId(null);
-          }}
-          style={{ cursor: 'pointer', marginBottom: '10px' }}
+        <li
+          className="movieItem"
+          key={movie.id}
+          onMouseEnter={() => onMovieHover(movie)}
         >
-          <div>{movie.title}</div>
-          {hoveredMovieId === movie.id && (
-            <div style={{ fontSize: '0.85em', color: '#555', marginTop: '2px' }}>
-              {movie.description}
-            </div>
-          )}
+          {movie.title}
         </li>
       ))}
     </ul>

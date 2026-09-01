@@ -22,7 +22,11 @@ function MovieDetails({ movie }) {
       <h2>Movie Details</h2>
       <div className="movie-detail-card">
         {details?.movie?.image_url && (
-          <img src={details.movie.image_url} alt={details.movie.title || movie.title} className="movie-detail-poster" />
+          <img
+            src={details.movie.image_url}
+            alt={details.movie.title || movie.title}
+            className="movie-detail-poster"
+          />
         )}
         <h3>{details?.movie?.title || movie.title}</h3>
         <p>{details?.movie?.description || movie.description}</p>
