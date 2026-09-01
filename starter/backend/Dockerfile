@@ -20,5 +20,5 @@ COPY . /app
 WORKDIR /app
 ENV PYTHONPATH=/app
 
-# Bind on all interfaces so the Kubernetes Service can reach the pod
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--access-logfile", "-", "app:app"]
+# Single worker keeps memory low on the course t3.small node
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--access-logfile", "-", "app:app"]
