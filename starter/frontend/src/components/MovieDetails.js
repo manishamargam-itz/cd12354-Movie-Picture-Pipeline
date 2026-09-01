@@ -6,31 +6,26 @@ function MovieDetails({ movie }) {
   const [details, setDetails] = useState(null);
 
   useEffect(() => {
+    setDetails(null);
     if (movie && movie.id) {
-      axios.get(`${process.env.REACT_APP_MOVIE_API_URL}/movies/${movie.id}`).then((response) => {
-        setDetails(response.data);
+      const apiUrl = process.env.REACT_APP_MOVIE_API_URL || 'http://localhost:5000';
+      axios.get(`${apiUrl}/movies/${movie.id}`).then((response) => {
+        setDetails(response.data.movie);
       });
     }
   }, [movie]);
 
   if (!movie) {
-    return <div className="movie-detail-container">Select a movie to see details.</div>;
+    return <p>Hover over a movie to see details</p>;
   }
 
+  const title = details?.title || movie.title;
+  const description = details?.description || movie.description;
+
   return (
-    <div className="movie-detail-container">
-      <h2>Movie Details</h2>
-      <div className="movie-detail-card">
-        {details?.movie?.image_url && (
-          <img
-            src={details.movie.image_url}
-            alt={details.movie.title || movie.title}
-            className="movie-detail-poster"
-          />
-        )}
-        <h3>{details?.movie?.title || movie.title}</h3>
-        <p>{details?.movie?.description || movie.description}</p>
-      </div>
+    <div className="movie-details">
+      <h2 className="movie-title">{title}</h2>
+      {description && <p className="movie-description">{description}</p>}
     </div>
   );
 }
@@ -40,7 +35,6 @@ MovieDetails.propTypes = {
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     title: PropTypes.string,
     description: PropTypes.string,
-    image_url: PropTypes.string,
   }),
 };
 
