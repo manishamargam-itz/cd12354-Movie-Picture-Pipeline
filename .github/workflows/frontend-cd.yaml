@@ -98,7 +98,14 @@ jobs:
         run: |
           kustomize edit set image frontend=${{ needs.build.outputs.image }}
           kustomize build . | kubectl apply -f -
-          kubectl rollout status deployment/frontend --timeout=120s
+          if ! kubectl rollout status deployment/frontend --timeout=300s; then
+            echo "::error::Frontend rollout failed. Collecting diagnostics..."
+            kubectl get pods -l app=frontend -o wide || true
+            kubectl describe deployment frontend || true
+            kubectl describe pods -l app=frontend || true
+            kubectl logs -l app=frontend --all-containers --tail=200 || true
+            exit 1
+          fi
 
   notify:
     name: Report Deployment Failure

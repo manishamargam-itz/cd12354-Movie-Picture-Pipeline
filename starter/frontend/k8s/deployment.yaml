@@ -6,6 +6,9 @@ metadata:
     app: frontend
 spec:
   replicas: 1
+  # Single t3.small node cannot schedule a surged second pod during RollingUpdate.
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: frontend
@@ -19,3 +22,20 @@ spec:
           image: frontend
           ports:
             - containerPort: 3000
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+          readinessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 10
