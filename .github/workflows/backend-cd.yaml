@@ -92,7 +92,7 @@ jobs:
         run: |
           kustomize edit set image backend=${{ needs.build.outputs.image }}
           kustomize build . | kubectl apply -f -
-          kubectl rollout status deployment/backend --timeout=120s
+          kubectl rollout status deployment/backend --timeout=300s
 
   notify:
     name: Report Deployment Failure

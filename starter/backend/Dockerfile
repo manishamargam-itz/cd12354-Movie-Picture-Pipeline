@@ -17,5 +17,8 @@ COPY Pipfile* /app
 RUN cd /app && pipenv install --system
 
 COPY . /app
+WORKDIR /app
+ENV PYTHONPATH=/app
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--access-logfile", "-", "app:app"]
+# Bind on all interfaces so the Kubernetes Service can reach the pod
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--access-logfile", "-", "app:app"]
