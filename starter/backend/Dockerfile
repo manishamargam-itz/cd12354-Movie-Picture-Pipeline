@@ -1,5 +1,5 @@
 FROM public.ecr.aws/docker/library/python:3.10-alpine
-# Trigger fresh CI run with updated Pipfile.lock
+# Trigger CI with properly committed Pipfile.lock
 ENV FLASK_RUN_HOST=0.0.0.0
 
 WORKDIR /
