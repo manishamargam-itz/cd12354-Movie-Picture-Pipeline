@@ -58,7 +58,8 @@
         },
         "gunicorn": {
             "hashes": [
-                "sha256:4fd8e7a1aab2b2a22c7c8a826a33ecb5fdd16cbf4c3ba71b81236c1a7a74d29"
+                "sha256:4fd8e7a1aab2b2a22c7c8a826a33ecb5fdd16cbf4c3ba71b81236c1a7a74d29f",
+                "sha256:9dcc4547deb34b51ca4b9f16786624d2595a10ad0b01d9526a41f9e317e1d059"
             ],
             "index": "pypi",
             "version": "==21.2.0"

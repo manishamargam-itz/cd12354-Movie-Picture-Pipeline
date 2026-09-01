@@ -17,4 +17,4 @@ RUN cd /app && pipenv install --system --deploy
 
 COPY . /app
 
-CMD gunicorn --bind 0.0.0.0:5000 --workers 4 --access-logfile - app:app
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--access-logfile", "-", "app:app"]
