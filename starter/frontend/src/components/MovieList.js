@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 
-function MovieList({ onMovieClick }) {
+function MovieList({ onMovieHover }) {
   const [movies, setMovies] = useState([]);
 
   useEffect(() => {
@@ -14,7 +14,7 @@ function MovieList({ onMovieClick }) {
   return (
     <ul>
       {movies.map((movie) => (
-        <li className="movieItem" key={movie.id} onClick={() => onMovieClick(movie)}>
+        <li className="movieItem" key={movie.id} onMouseEnter={() => onMovieHover(movie)}>
           {movie.title}
         </li>
       ))}
@@ -23,7 +23,7 @@ function MovieList({ onMovieClick }) {
 }
 
 MovieList.propTypes = {
-  onMovieClick: PropTypes.func.isRequired,
+  onMovieHover: PropTypes.func.isRequired,
 };
 
 export default MovieList;

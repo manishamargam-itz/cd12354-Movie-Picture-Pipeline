@@ -3,25 +3,18 @@ import MovieList from './components/MovieList';
 import MovieDetails from './components/MovieDetails';
 import './App.css';
 
-export default function App() {
+function App() {
   const [selectedMovie, setSelectedMovie] = useState(null);
-
-  const handleMovieClick = (movie) => {
-    setSelectedMovie(movie);
-  };
 
   return (
     <div className="container">
       <h1>Movie List</h1>
-
-      <MovieList onMovieClick={handleMovieClick} />
-
-      {selectedMovie && (
-        <>
-          <h1>Movie Details</h1>
-          <MovieDetails movie={selectedMovie} />
-        </>
-      )}
+      <MovieList onMovieHover={setSelectedMovie} />
+      
+      <h1>Movie Details</h1>
+      {selectedMovie ? <MovieDetails movie={selectedMovie} /> : <p>Hover over a movie to see details</p>}
     </div>
   );
 }
+
+export default App;
