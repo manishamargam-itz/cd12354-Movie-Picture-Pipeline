@@ -71,6 +71,9 @@ jobs:
     if: ${{ always() && contains(needs.*.result, 'failure') }}
     needs: [lint, test, build]
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
     steps:
       - name: Add failure notice
         run: |
