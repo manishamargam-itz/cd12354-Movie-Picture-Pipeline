@@ -106,6 +106,19 @@ jobs:
             kubectl logs -l app=frontend --all-containers --tail=200 || true
             exit 1
           fi
+      - name: Verify Kubernetes deployment
+        if: always()
+        run: |
+          kubectl rollout status deployment/frontend --timeout=180s || true
+          echo "----- Logging - kubectl get all ---- "
+          kubectl get all
+          echo "----- Logging - kubectl describe deploy ----- "
+          kubectl describe deploy frontend
+      - name: Verify Frontend ECR image
+        if: always()
+        run: |
+          echo "----- Logging - Frontend ECR Image Details ----- "
+          AWS_PAGER="" aws ecr describe-images --repository-name frontend --region us-east-1 --query 'sort_by(imageDetails,&imagePushedAt)[-1].{Tags:imageTags,Digest:imageDigest,PushedAt:imagePushedAt}' --output table
 
   notify:
     name: Report Deployment Failure
