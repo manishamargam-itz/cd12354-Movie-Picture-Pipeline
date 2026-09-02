@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import { getMovieApiUrl } from '../api';
 
 function MovieList({ onMovieHover, onMovieClick }) {
   const [movies, setMovies] = useState([]);
 
   useEffect(() => {
-    const apiUrl = process.env.REACT_APP_MOVIE_API_URL || 'http://localhost:5000';
-    axios.get(`${apiUrl}/movies`).then((response) => {
-      setMovies(response.data.movies);
-    });
+    axios
+      .get(`${getMovieApiUrl()}/movies`)
+      .then((response) => {
+        setMovies(response.data.movies || []);
+      })
+      .catch(() => {
+        setMovies([]);
+      });
   }, []);
 
   const handleSelect = (movie) => {
@@ -28,6 +33,7 @@ function MovieList({ onMovieHover, onMovieClick }) {
           className="movieItem"
           key={movie.id}
           onMouseEnter={() => handleSelect(movie)}
+          onMouseOver={() => handleSelect(movie)}
           onClick={() => handleSelect(movie)}
         >
           {movie.title}

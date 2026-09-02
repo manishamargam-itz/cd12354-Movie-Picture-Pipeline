@@ -21,4 +21,5 @@ RUN npm run build
 EXPOSE 3000
 
 # Start the React app when the container starts
-CMD ["npm", "run", "serve"]
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+ENTRYPOINT ["sh", "/app/docker-entrypoint.sh"]

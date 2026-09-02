@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import { getMovieApiUrl } from '../api';
 
 function MovieDetails({ movie }) {
   const [details, setDetails] = useState(null);
@@ -8,10 +9,14 @@ function MovieDetails({ movie }) {
   useEffect(() => {
     setDetails(null);
     if (movie && movie.id) {
-      const apiUrl = process.env.REACT_APP_MOVIE_API_URL || 'http://localhost:5000';
-      axios.get(`${apiUrl}/movies/${movie.id}`).then((response) => {
-        setDetails(response.data.movie);
-      });
+      axios
+        .get(`${getMovieApiUrl()}/movies/${movie.id}`)
+        .then((response) => {
+          setDetails(response.data.movie);
+        })
+        .catch(() => {
+          setDetails(null);
+        });
     }
   }, [movie]);
 
@@ -25,7 +30,7 @@ function MovieDetails({ movie }) {
   return (
     <div className="movie-details">
       <h2 className="movie-title">{title}</h2>
-      {description && <p className="movie-description">{description}</p>}
+      {description ? <p className="movie-description">{description}</p> : null}
     </div>
   );
 }
